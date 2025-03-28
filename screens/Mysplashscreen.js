@@ -41,7 +41,7 @@ const Mysplashscreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#4CAF50', // POS theme color
+        backgroundColor: '#03bafc', // POS theme color
         alignItems: 'center',
         justifyContent: 'center',
     },

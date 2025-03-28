@@ -28,11 +28,17 @@ const App = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
+
             try {
-                const response = await fetch('http://192.168.100.105:8000/Sales/products/');
+                const currentUser = auth.currentUser;
+            if (currentUser) {
+                const firebaseId = currentUser.uid
+                const response = await fetch(`http://192.168.81.95:8000/Sales/products/${firebaseId}/`);
                 const data = await response.json();
                 setProducts(data);
                 console.log(data);
+
+            }
             } catch (error) {
                 console.error(error);
             }
@@ -45,7 +51,7 @@ const App = () => {
                 const currentUser = auth.currentUser;
                 if (currentUser) {
                     const firebaseId = currentUser.uid; // Get Firebase ID
-                    const response = await fetch(`http://192.168.100.105:8000/Auth/get_user_role/${firebaseId}/`);
+                    const response = await fetch(`http://192.168.81.95:8000/Auth/get_user_role/${firebaseId}/`);
                     const data = await response.json();
                     setUser(data);
                     console.log(data);
@@ -57,7 +63,7 @@ const App = () => {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://192.168.100.105:8000/Sales/categories/');
+                const response = await fetch('http://192.168.81.95:8000/Sales/categories/');
                 const data = await response.json();
                 setCategories(data);
             } catch (error) {
@@ -201,7 +207,7 @@ const App = () => {
                     <Text style={styles.role}>{user.role}</Text>
                 </View>
                 <View style={styles.headerIcons}>
-                    <TouchableOpacity onPress={() => navigation.navigate('')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Barcode')}>
                         <Icon name="barcode-outline" size={24} color="#000" />
                     </TouchableOpacity>
                 </View>

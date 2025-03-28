@@ -34,7 +34,10 @@ const App = () => {
                     <Text style={styles.menuText}>Sales Invoices</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity
+                    style={styles.menuItem}
+                    onPress={() => navigation.navigate('productAdd')}
+                >
                     <View style={styles.menuIconContainer}>
                         <MaterialIcons name="shopping-cart" size={30} color="#f44336" />
                     </View>
