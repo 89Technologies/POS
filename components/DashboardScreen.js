@@ -92,7 +92,7 @@ const App = () => {
                     <View style={styles.menuIconContainer}>
                         <MaterialIcons name="person" size={30} color="#673AB7" />
                     </View>
-                    <Text style={styles.menuText}>Customer</Text>
+                    <Text style={styles.menuText}>Customers</Text>
                 </TouchableOpacity>
 
                 {/*<TouchableOpacity style={styles.menuItem}>*/}
