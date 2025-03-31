@@ -78,8 +78,8 @@ const SignInScreen = ({ navigation }) => {
             // Make a request to your backend to fetch the user role
 
             // const firebaseId='403qgdQrroZfj1rtekQwATLF09I3';
-            const response = await axios.get(`http://192.168.81.95:8000/Auth/get_user_role/${firebaseId}`);
-            // const response = await axios.get(`http://192.168.81.95:8000/Auth/get_user_role/${firebaseId}`);
+            const response = await axios.get(`http://192.168.51.77:8000/Auth/get_user_role/${firebaseId}`);
+            // const response = await axios.get(`http://192.168.51.77:8000/Auth/get_user_role/${firebaseId}`);
             const role = response.data.role;
             const token = response.data.token;
             console.log("my token")
