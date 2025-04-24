@@ -33,7 +33,7 @@ const App = () => {
                 const currentUser = auth.currentUser;
             if (currentUser) {
                 const firebaseId = currentUser.uid
-                const response = await fetch(`http://192.168.51.77:8000/Sales/products/${firebaseId}/`);
+                const response = await fetch(`http://192.168.155.11:8000/Sales/products/${firebaseId}/`);
                 const data = await response.json();
                 setProducts(data);
                 console.log(data);
@@ -51,7 +51,7 @@ const App = () => {
                 const currentUser = auth.currentUser;
                 if (currentUser) {
                     const firebaseId = currentUser.uid; // Get Firebase ID
-                    const response = await fetch(`http://192.168.51.77:8000/Auth/get_user_role/${firebaseId}/`);
+                    const response = await fetch(`http://192.168.155.11:8000/Auth/get_user_role/${firebaseId}/`);
                     const data = await response.json();
                     setUser(data);
                     console.log(data);
@@ -63,7 +63,7 @@ const App = () => {
 
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://192.168.51.77:8000/Sales/categories/');
+                const response = await fetch('http://192.168.155.11:8000/Sales/categories/');
                 const data = await response.json();
                 setCategories(data);
             } catch (error) {

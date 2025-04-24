@@ -44,12 +44,15 @@ const App = () => {
                     <Text style={styles.menuText}>Inventory</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem}
+                                  onPress={() => navigation.navigate('Supplier')}
+                >
+
                     <View style={styles.menuIconContainer}>
                         <MaterialIcons name="receipt-long" size={30} color="#2196F3" />
                     </View>
-                    <Text style={styles.menuText}>Shipments</Text>
-                </TouchableOpacity>
+                    <Text style={styles.menuText}>Suppliers</Text>
+                </TouchableOpacity>Supplier
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>
@@ -95,12 +98,7 @@ const App = () => {
                     <Text style={styles.menuText}>Customers</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity style={styles.menuItem}>*/}
-                {/*    <View style={styles.menuIconContainer}>*/}
-                {/*        <MaterialIcons name="people" size={30} color="#9C27B0" />*/}
-                {/*    </View>*/}
-                {/*    <Text style={styles.menuText}>Vendor</Text>*/}
-                {/*</TouchableOpacity>*/}
+
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>
@@ -109,12 +107,14 @@ const App = () => {
                     <Text style={styles.menuText}>Receipt Settings</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity style={styles.menuItem}>*/}
-                {/*    <View style={styles.menuIconContainer}>*/}
-                {/*        <MaterialIcons name="summarize" size={30} color="#FFC107" />*/}
-                {/*    </View>*/}
-                {/*    <Text style={styles.menuText}>Summary</Text>*/}
-                {/*</TouchableOpacity>*/}
+                <TouchableOpacity style={styles.menuItem}
+                                  onPress={() => navigation.navigate('PurchaseOrderDetail')}
+                >
+                    <View style={styles.menuIconContainer}>
+                        <MaterialIcons name="summarize" size={30} color="#FFC107" />
+                    </View>
+                    <Text style={styles.menuText}>Purchase orders</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>

@@ -79,7 +79,7 @@ const HomeScreen = () => {
             screenOptions={{
                 drawerActiveTintColor: '#007bff',
                 drawerInactiveTintColor: 'gray',
-                headerShown: true,
+                headerShown: false,
             }}
         >
             <Drawer.Screen
