@@ -42,6 +42,7 @@ const SignUpScreen = ({ navigation }) => {
                 await firebaseUser.reload();
                 return firebaseUser.emailVerified;
             };
+            Alert.alert(firebaseUserId);
 
             let isVerified = false;
             const maxAttempts = 6;
@@ -70,7 +71,7 @@ const SignUpScreen = ({ navigation }) => {
                 password,
             };
 
-            const response = await fetch('http://192.168.102.194:8000/Auth/register/', {
+            const response = await fetch('http://192.168.170.172:8000/Auth/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,6 +82,7 @@ const SignUpScreen = ({ navigation }) => {
             const result = await response.json();
             if (!response.ok) {
                 // Profile creation failed in backend, delete user in Firebase
+                alert(userData);
                 await deleteUser(firebaseUser);
                 Alert.alert('Error', 'Profile creation failed in backend. Your account has been deleted.');
                 return;

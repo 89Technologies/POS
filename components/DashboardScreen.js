@@ -19,7 +19,7 @@ const App = () => {
     return (
         <ImageBackground source={require('../assets/images/hex.jpg')} style={styles.container}>
             <ImageBackground source={require('../assets/images/pos.jpg')} style={styles.header}>
-                <Text style={styles.headerText}>MC-POS</Text>
+                <Text style={styles.headerText}>COLLEN-POS</Text>
                 <Text style={styles.dateText}>{currentDate}</Text>
             </ImageBackground>
 
@@ -29,24 +29,30 @@ const App = () => {
                     onPress={() => navigation.navigate('sales')} // Correct placement of onPress
                 >
                     <View style={styles.menuIconContainer}>
-                        <MaterialIcons name="receipt-long" size={30} color="#009688" />
+                        <MaterialIcons name="shopping-cart" size={30} color="#009688" />
                     </View>
-                    <Text style={styles.menuText}>Sales Invoices</Text>
+                    <Text style={styles.menuText}>Make Sale</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity
+                    style={styles.menuItem}
+                    onPress={() => navigation.navigate('productAdd')}
+                >
                     <View style={styles.menuIconContainer}>
-                        <MaterialIcons name="shopping-cart" size={30} color="#f44336" />
+                        <MaterialIcons name="local-shipping" size={30} color="#f44336" />
                     </View>
-                    <Text style={styles.menuText}>Purchase Order</Text>
+                    <Text style={styles.menuText}>Inventory</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem}
+                                  onPress={() => navigation.navigate('Supplier')}
+                >
+
                     <View style={styles.menuIconContainer}>
-                        <MaterialIcons name="local-shipping" size={30} color="#2196F3" />
+                        <MaterialIcons name="receipt-long" size={30} color="#2196F3" />
                     </View>
-                    <Text style={styles.menuText}>Shipments</Text>
-                </TouchableOpacity>
+                    <Text style={styles.menuText}>Suppliers</Text>
+                </TouchableOpacity>Supplier
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>
@@ -62,7 +68,9 @@ const App = () => {
                     <Text style={styles.menuText}>Expense</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem}
+                  onPress={() => navigation.navigate('LowStockScreen')}
+                >
                     <View style={styles.menuIconContainer}>
                         <MaterialIcons name="warning" size={30} color="#FF5722" />
                     </View>
@@ -87,15 +95,10 @@ const App = () => {
                     <View style={styles.menuIconContainer}>
                         <MaterialIcons name="person" size={30} color="#673AB7" />
                     </View>
-                    <Text style={styles.menuText}>Customer</Text>
+                    <Text style={styles.menuText}>Customers</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity style={styles.menuItem}>*/}
-                {/*    <View style={styles.menuIconContainer}>*/}
-                {/*        <MaterialIcons name="people" size={30} color="#9C27B0" />*/}
-                {/*    </View>*/}
-                {/*    <Text style={styles.menuText}>Vendor</Text>*/}
-                {/*</TouchableOpacity>*/}
+
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>
@@ -104,12 +107,14 @@ const App = () => {
                     <Text style={styles.menuText}>Receipt Settings</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity style={styles.menuItem}>*/}
-                {/*    <View style={styles.menuIconContainer}>*/}
-                {/*        <MaterialIcons name="summarize" size={30} color="#FFC107" />*/}
-                {/*    </View>*/}
-                {/*    <Text style={styles.menuText}>Summary</Text>*/}
-                {/*</TouchableOpacity>*/}
+                <TouchableOpacity style={styles.menuItem}
+                                  onPress={() => navigation.navigate('PurchaseOrderDetail')}
+                >
+                    <View style={styles.menuIconContainer}>
+                        <MaterialIcons name="summarize" size={30} color="#FFC107" />
+                    </View>
+                    <Text style={styles.menuText}>Purchase orders</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>
@@ -118,12 +123,6 @@ const App = () => {
                     <Text style={styles.menuText}>Sales Order</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity style={styles.menuItem}>*/}
-                {/*    <View style={styles.menuIconContainer}>*/}
-                {/*        <MaterialIcons name="account-balance" size={30} color="#2196F3" />*/}
-                {/*    </View>*/}
-                {/*    <Text style={styles.menuText}>Cash Ledger</Text>*/}
-                {/*</TouchableOpacity>*/}
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>

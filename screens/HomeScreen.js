@@ -10,19 +10,19 @@ import SettingScreen from '../components/SettingsScreen';
 // Example Screens for Tabs
 const DashboardTab = () => (
     <View style={styles.container}>
-        <DashboardScreen /> {/* Use imported component */}
+        <DashboardScreen />
     </View>
 );
 
 const ProfileTab = () => (
     <View style={styles.container}>
-        <ProfileScreen /> {/* Use imported component */}
+        <ProfileScreen />
     </View>
 );
 
 const SettingsTab = () => (
     <View style={styles.container}>
-        <SettingScreen /> {/* Use imported component */}
+        <SettingScreen />
     </View>
 );
 
@@ -79,7 +79,7 @@ const HomeScreen = () => {
             screenOptions={{
                 drawerActiveTintColor: '#007bff',
                 drawerInactiveTintColor: 'gray',
-                headerShown: true,
+                headerShown: false,
             }}
         >
             <Drawer.Screen

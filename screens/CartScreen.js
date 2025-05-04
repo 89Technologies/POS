@@ -14,6 +14,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import api from '../api/api';
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { shareAsync } from 'expo-sharing';
 
 const OrderScreen = () => {
     const route = useRoute();
@@ -28,6 +32,8 @@ const OrderScreen = () => {
     const [loading, setLoading] = useState(false);
     const [customers, setCustomers] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [transactionSuccess, setTransactionSuccess] = useState(false);
+    const [transactionId, setTransactionId] = useState(null);
 
     const [cartItems, setCartItems] = useState(cart);
     const user_cashier=user;
@@ -37,6 +43,105 @@ const OrderScreen = () => {
     const [selectedCurrency, setSelectedCurrency] = useState(null);
     const [exchangeRate, setExchangeRate] = useState(null);
 
+
+
+    const handlePrintReceipt = async () => {
+        try {
+            // Generate HTML for the receipt
+            const html = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { color: #6200EE; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .total { font-weight: bold; }
+            .header { text-align: center; margin-bottom: 20px; }
+            .footer { margin-top: 30px; font-size: 12px; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Your Store Name</h1>
+            <p>123 Store Address, City</p>
+            <p>Tel: (123) 456-7890</p>
+          </div>
+          
+          <h2>Receipt #${transactionId}</h2>
+          <p>Date: ${new Date().toLocaleString()}</p>
+          <p>Cashier: ${user_cashier?.first_name || 'N/A'}</p>
+          <p>Customer: ${selectedCustomer?.full_name || 'Walk-in'}</p>
+          
+          <table>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+            ${cartItems.map(item => {
+                const price = exchangeRate ? (item.price * exchangeRate).toFixed(2) : item.price.toFixed(2);
+                const total = (price * item.quantity).toFixed(2);
+                return `
+                <tr>
+                  <td>${item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${price}</td>
+                  <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${total}</td>
+                </tr>
+              `;
+            }).join('')}
+            <tr class="total">
+              <td colspan="3">Subtotal</td>
+              <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${adjustedSubtotal.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colspan="3">Tax (5%)</td>
+              <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${adjustedTax.toFixed(2)}</td>
+            </tr>
+            <tr class="total">
+              <td colspan="3">Total</td>
+              <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${adjustedTotal.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colspan="3">Amount Paid</td>
+              <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${amountEntered}</td>
+            </tr>
+            <tr>
+              <td colspan="3">Change</td>
+              <td>${selectedCurrency ? selectedCurrency.toUpperCase() : '$'}${typeof change === "number" ? change.toFixed(2) : change}</td>
+            </tr>
+          </table>
+          
+          <div class="footer">
+            <p>Thank you for your purchase!</p>
+            <p>Please come again</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+            // Generate PDF
+            const { uri } = await Print.printToFileAsync({ html });
+            console.log('PDF generated at:', uri);
+
+            // Print the PDF
+            await Print.printAsync({ uri });
+
+            // Save PDF to device
+            const pdfName = `Receipt_${transactionId}.pdf`;
+            const newUri = `${FileSystem.documentDirectory}${pdfName}`;
+            await FileSystem.copyAsync({ from: uri, to: newUri });
+
+            // Share/download the PDF
+            shareAsync(newUri); // Opens native share dialog
+        } catch (error) {
+            alert('Failed to print: ' + error.message);
+            console.error(error);
+        }
+    };
     // Fetch customer data
     const fetchCustomers = async () => {
         setLoading(true);
@@ -44,7 +149,7 @@ const OrderScreen = () => {
         console.log('my user is----77776557-')
         console.log(user_cashier)
         try {
-            const response = await fetch("http://192.168.100.105:8000/Sales/fetch_customer/");
+            const response = await fetch("http://192.168.170.172:8000/Sales/fetch_customer/");
             const contentType = response.headers.get("content-type");
 
             if (contentType && contentType.includes("application/json")) {
@@ -65,7 +170,7 @@ const OrderScreen = () => {
     // Fetch exchange rate based on selected currency
     const fetchExchangeRate = async (currencyName) => {
         try {
-            const response = await fetch(`http://192.168.100.105:8000/Sales/exchange_rate/${currencyName}`);
+            const response = await fetch(`http://192.168.170.172:8000/Sales/exchange_rate/${currencyName}`);
             const data = await response.json();
             console.log("Parsed Response:", data);
 
@@ -140,27 +245,28 @@ const OrderScreen = () => {
         setCartItems(updatedCart);
     };
 
-    const handleSubmitTransaction = async (user) => {
-        if (!user || cart.length === 0) {
-            alert("Please make sure user and cart data are valid.");
+    const handleSubmitTransaction = async () => {
+        if (!selectedCustomer || cartItems.length === 0) {
+            alert("Please make sure customer and cart data are valid.");
             return;
         }
 
+        setLoading(true); // Show loading indicator
+
         const transactionData = {
             customer: {
-                id: selectedCustomer.id, // Assuming `id` exists in the customer object
-               first_name: selectedCustomer.full_name,
+                id: selectedCustomer.id,
+                first_name: selectedCustomer.full_name,
                 email: selectedCustomer.email,
-               loyalty_points: selectedCustomer.loyalty_points
-
+                loyalty_points: selectedCustomer.loyalty_points,
             },
             cashier: {
-                id: user_cashier.id, // Assuming the logged-in user is the cashier
+                id: user_cashier.id,
                 role: user_cashier.role,
                 first_name: user_cashier.first_name,
                 phone_number: user_cashier.phone_number,
             },
-            order_items: cart.map((item) => ({
+            order_items: cartItems.map((item) => ({
                 product_id: item.id,
                 quantity: item.quantity,
                 price: exchangeRate ? item.price * exchangeRate : item.price,
@@ -168,14 +274,14 @@ const OrderScreen = () => {
             transaction: {
                 total_amount: adjustedTotal,
                 date: new Date().toISOString(),
-                currency:selectedCurrency,
-                change: change, // Send change amount
-                amount_paid: parseFloat(amountEntered)
+                currency: selectedCurrency,
+                change: change,
+                amount_paid: parseFloat(amountEntered),
             },
         };
 
         try {
-            const response = await fetch('http://192.168.100.105:8000/Sales/create_transaction/', {
+            const response = await fetch('http://192.168.170.172:8000/Sales/create_transaction/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -185,19 +291,76 @@ const OrderScreen = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                alert("Transaction submitted successfully!");
-                console.log(result);
+                setTransactionSuccess(true);
+                setTransactionId(result.order_id);
+                setPaymentModalVisible(false); // Close payment modal
             } else {
                 const errorData = await response.json();
-                console.error('Error submitting transaction:', errorData);
-                alert("Failed to submit transaction. Please try again.");
+                alert("Failed to submit transaction: " + (errorData.message || "Please try again"));
             }
         } catch (error) {
-            console.error('Error:', error);
-            alert("An error occurred. Please check your network connection.");
+            alert("Network error: " + error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
+    // const handleSubmitTransaction = async () => {
+    //     if (!selectedCustomer || cartItems.length === 0) {
+    //         alert("Please make sure customer and cart data are valid.");
+    //         return;
+    //     }
+    //
+    //     const transactionData = {
+    //         customer: {
+    //             id: selectedCustomer.id, // Assuming `id` exists in the customer object
+    //             first_name: selectedCustomer.full_name,
+    //             email: selectedCustomer.email,
+    //             loyalty_points: selectedCustomer.loyalty_points,
+    //         },
+    //         cashier: {
+    //             id: user_cashier.id, // Assuming the logged-in user is the cashier
+    //             role: user_cashier.role,
+    //             first_name: user_cashier.first_name,
+    //             phone_number: user_cashier.phone_number,
+    //         },
+    //         order_items: cartItems.map((item) => ({
+    //             product_id: item.id,
+    //             quantity: item.quantity,
+    //             price: exchangeRate ? item.price * exchangeRate : item.price,
+    //         })),
+    //         transaction: {
+    //             total_amount: adjustedTotal,
+    //             date: new Date().toISOString(),
+    //             currency: selectedCurrency,
+    //             change: change, // Send change amount
+    //             amount_paid: parseFloat(amountEntered),
+    //         },
+    //     };
+    //
+    //     try {
+    //         const response = await fetch('http://192.168.170.172:8000/Sales/create_transaction/', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(transactionData),
+    //         });
+    //        console.log(transactionData) ;
+    //         if (response.ok) {
+    //             const result = await response.json();
+    //             alert("Transaction submitted successfully!");
+    //             console.log(result);
+    //         } else {
+    //             const errorData = await response.json();
+    //             console.error('Error submitting transaction:', errorData);
+    //             alert("Failed to submit transaction. Please try again.");
+    //         }
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //         alert("An error occurred. Please check your network connection.");
+    //     }
+    // };
 
     // Calculate adjusted subtotal, tax, and total based on exchange rate
     const adjustedSubtotal = cartItems.reduce(
@@ -214,7 +377,16 @@ const OrderScreen = () => {
 
     return (
         <View style={styles.container}>
+
+            {loading && (
+                <View style={styles.loadingOverlay}>
+                    <ActivityIndicator size="large" color="#6200EE" />
+                    <Text style={styles.loadingText}>Processing Transaction...</Text>
+                </View>
+            )}
+
             <View style={styles.header}>
+
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="black" />
                 </TouchableOpacity>
@@ -403,6 +575,77 @@ const OrderScreen = () => {
                     <Button title="Close" onPress={() => setPaymentModalVisible(false)} />
                 </View>
             </Modal>
+
+            {/*/!* Success Modal *!/*/}
+            {/*<Modal visible={transactionSuccess} animationType="slide">*/}
+            {/*    <View style={styles.successModal}>*/}
+            {/*        <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />*/}
+            {/*        <Text style={styles.successText}>Transaction Successful!</Text>*/}
+            {/*        <Text style={styles.orderIdText}>Order ID: {transactionId}</Text>*/}
+
+            {/*        <TouchableOpacity*/}
+            {/*            style={styles.printButton}*/}
+            {/*            onPress={handlePrintReceipt}*/}
+            {/*        >*/}
+            {/*            <Ionicons name="print" size={24} color="white" />*/}
+            {/*            <Text style={styles.printButtonText}>Print Receipt</Text>*/}
+            {/*        </TouchableOpacity>*/}
+
+            {/*        <TouchableOpacity*/}
+            {/*            style={styles.newOrderButton}*/}
+            {/*            onPress={() => {*/}
+            {/*                setTransactionSuccess(false);*/}
+            {/*                setCartItems([]);*/}
+            {/*                setSelectedCustomer(null);*/}
+            {/*                setAmountEntered("");*/}
+            {/*                setChange(null);*/}
+            {/*            }}*/}
+            {/*        >*/}
+            {/*            <Text style={styles.newOrderButtonText}>New Order</Text>*/}
+            {/*        </TouchableOpacity>*/}
+            {/*    </View>*/}
+            {/*</Modal>*/}
+
+            {/* Success Modal */}
+            <Modal visible={transactionSuccess} animationType="slide">
+                <View style={styles.successModal}>
+                    <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
+                    <Text style={styles.successText}>Transaction Successful!</Text>
+                    <Text style={styles.orderIdText}>Order ID: {transactionId}</Text>
+
+                    <TouchableOpacity
+                        style={styles.printButton}
+                        onPress={handlePrintReceipt}
+                    >
+                        <Ionicons name="print" size={24} color="white" />
+                        <Text style={styles.printButtonText}>Print Receipt</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.printButton, { backgroundColor: '#4CAF50' }]}
+                        onPress={async () => {
+                            await handlePrintReceipt();
+                        }}
+                    >
+                        <Ionicons name="download" size={24} color="white" />
+                        <Text style={styles.printButtonText}>Download PDF</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.newOrderButton}
+                        onPress={() => {
+                            setTransactionSuccess(false);
+                            setCartItems([]);
+                            setSelectedCustomer(null);
+                            setAmountEntered("");
+                            setChange(null);
+                        }}
+                    >
+                        <Text style={styles.newOrderButtonText}>New Order</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
+
         </View>
     );
 };
@@ -646,6 +889,78 @@ const styles = StyleSheet.create({
         alignItems: "center",fontWeight: "700",padding:10,
 
     },
+
+    successModal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: '#fff',
+    },
+    successText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginVertical: 20,
+        color: '#4CAF50',
+    },
+    orderIdText: {
+        fontSize: 18,
+        marginBottom: 30,
+        color: '#555',
+    },
+    printButton: {
+        flexDirection: 'row',
+        backgroundColor: '#6200EE',
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '80%',
+        marginBottom: 20,
+    },
+    printButtonText: {
+        color: 'white',
+        fontSize: 18,
+        marginLeft: 10,
+        fontWeight: '600',
+    },
+    newOrderButton: {
+        backgroundColor: '#7E57C2',
+        padding: 15,
+        borderRadius: 8,
+        width: '80%',
+        alignItems: 'center',
+    },
+    newOrderButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    loadingText: {
+        marginTop: 20,
+        fontSize: 16,
+        color: '#6200EE',
+    },
+    downloadButton: {
+        backgroundColor: '#4CAF50',
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+
 
 });
 

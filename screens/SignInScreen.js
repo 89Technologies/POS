@@ -46,6 +46,7 @@ const SignInScreen = ({ navigation }) => {
                 fetchUserRole(firebaseId); // Call the function to fetch role
             }, 1000); // Delay the role fetching to show success icon for 1 second
         } catch (error) {
+            // navigation.navigate('HomeScreen');
             setIsLoading(false); // Hide spinner on error
             let errorMessage = 'An error occurred. Please try again.';
             switch (error.code) {
@@ -72,9 +73,13 @@ const SignInScreen = ({ navigation }) => {
     };
 
     const fetchUserRole = async (firebaseId) => {
+        // navigation.navigate('HomeScreen');
         try {
             // Make a request to your backend to fetch the user role
-            const response = await axios.get(`http://192.168.100.105:8000/Auth/get_user_role/${firebaseId}`);
+
+            // const firebaseId='403qgdQrroZfj1rtekQwATLF09I3';
+            const response = await axios.get(`http://192.168.170.172:8000/Auth/get_user_role/${firebaseId}`);
+            // const response = await axios.get(`http://192.168.170.172:8000/Auth/get_user_role/${firebaseId}`);
             const role = response.data.role;
             const token = response.data.token;
             console.log("my token")
@@ -87,12 +92,15 @@ const SignInScreen = ({ navigation }) => {
             } else if (role === 'admin') {
                 navigation.navigate('Settings');
             } else if (role === 'manager') {
-                navigation.navigate('PatientHomeScreen');
+                // navigation.navigate('PatientHomeScreen');
+                navigation.navigate('HomeScreen');
             } else {
                 Alert.alert('Error', 'Role not found.');
             }
         } catch (error) {
+            navigation.navigate('HomeScreen');
             Alert.alert('Error', 'Failed to fetch user role.');
+            navigation.navigate('HomeScreen');
             //
         }
     };

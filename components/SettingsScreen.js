@@ -1,203 +1,278 @@
-import React from "react";
-import { View, Text, StyleSheet, TextInput, ScrollView, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // For icons
+import { View, Text, FlatList, TouchableOpacity, Linking, Image, Share, ActivityIndicator, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useNavigation } from '@react-navigation/native';
 
-export default function PaymentScreen() {
+
+
+
+export default function ActionButton() {
+    const navigation = useNavigation();
+    const [business, setBusiness] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        fetchCompanyData()
+    }, [])
+
+    const fetchCompanyData = async () => {
+        try {
+            const response = await axios.get('http://192.168.170.172:8000/Sales/company/')
+            setBusiness(response.data)
+        } catch (error) {
+            console.error("Error fetching company data:", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const actionButtonMenu = [
+        {
+            id: 1,
+            name: 'Call',
+            icon: require('../assets/images/call.png'),
+            url: 'tel:' + business?.phone
+        },
+        // {
+        //     id: 2,
+        //     name: 'Message',
+        //     // icon: require('../assets/images/message.png'),
+        //     url: 'sms:' + business?.phone
+        // },
+        {
+            id: 3,
+            name: 'Location',
+            icon: require('../assets/images/pin.png'),
+            url: 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(
+                `${business?.address}, ${business?.city}, ${business?.country}`
+            )
+        },
+        {
+            id: 4,
+            name: 'Share',
+            icon: require('../assets/images/share.png'),
+            action: () => Share.share({
+                message: `${business?.name}\nAddress: ${business?.address}, ${business?.city}\nContact: ${business?.phone}\nWebsite: ${business?.website}`
+            })
+        },
+        {
+            id: 5,
+            name: 'Web',
+            icon: require('../assets/images/web.png'),
+            url: business?.website
+        },
+        {
+            id: 6,
+            name: 'Email',
+            icon: require('../assets/images/mail.png'),
+            url: `mailto:${business?.email}?subject=Inquiry about ${business?.name}`
+        },
+        {
+            id: 7,
+            name: 'Settings',
+            icon: require('../assets/images/settings.jpg'),
+            action: () => navigation.navigate('SettingsMain')
+        },
+        // {
+        //     id: 8,
+        //     name: 'About',
+        //     icon: require('../assets/images/question.jpg'),
+        //     action: () => navigation.navigate('About')
+        // },
+    ]
+
+    const handleAction = (item) => {
+        if (item.action) {
+            item.action()
+        } else if (item.url) {
+            Linking.openURL(item.url).catch(err => console.error("Couldn't load page", err))
+        }
+    }
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#4A90E2" />
+                <Text style={styles.loadingText}>Loading company info...</Text>
+            </View>
+        )
+    }
+
+    if (!business) {
+        return (
+            <View style={styles.loadingContainer}>
+                <Text style={styles.errorText}>No business information available</Text>
+            </View>
+        )
+    }
+
     return (
-        <ScrollView style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Image
-                    source={{ uri: "https://via.placeholder.com/40" }}
-                    style={styles.profileImage}
-                />
-                <Text style={styles.headerText}>Payments</Text>
-                <Ionicons name="qr-code-outline" size={24} color="white" />
+        <View style={styles.container}>
+            {/* Company Header */}
+            <View style={styles.companyHeader}>
+                {business.logo_url ? (
+                    <Image
+                        source={{ uri: business.logo_url }}
+                        style={styles.logo}
+                        resizeMode="contain"
+                        onError={(e) => console.log('Failed to load logo:', e.nativeEvent.error)}
+                    />
+                ) : (
+                    <View style={styles.logoPlaceholder}>
+                        <Text style={styles.logoText}>{business.name.charAt(0)}</Text>
+                    </View>
+                )}
+                <Text style={styles.companyName}>{business.name}</Text>
+                {business.address && (
+                    <Text style={styles.companyAddress}>
+                        {business.address}, {business.city}
+                    </Text>
+                )}
             </View>
 
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-                <Ionicons name="search-outline" size={20} color="#6e6e6e" />
-                <TextInput
-                    placeholder="Search ATMs, Payments, Fines"
-                    placeholderTextColor="#6e6e6e"
-                    style={styles.searchInput}
-                />
-            </View>
-
-            {/* Favorites */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Favorites</Text>
-                <View style={styles.iconRow}>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="add-outline" size={24} color="white" />
-                        <Text style={styles.iconLabel}>Add</Text>
-                    </View>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="game-controller-outline" size={24} color="white" />
-                        <Text style={styles.iconLabel}>Games</Text>
-                    </View>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="receipt-outline" size={24} color="white" />
-                        <Text style={styles.iconLabel}>Bills</Text>
-                    </View>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="call-outline" size={24} color="white" />
-                        <Text style={styles.iconLabel}>Phone</Text>
-                    </View>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="heart-outline" size={24} color="white" />
-                        <Text style={styles.iconLabel}>Charity</Text>
-                    </View>
-                </View>
-            </View>
-
-            {/* Transfer Options */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Transfer options</Text>
-                <View style={styles.row}>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="swap-horizontal-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>Card to card</Text>
-                    </View>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="wallet-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>To account</Text>
-                    </View>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="bank-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>Bank transfer</Text>
-                    </View>
-                </View>
-            </View>
-
-            {/* Recent Transfers */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Recent transfers</Text>
-                <View style={styles.row}>
-                    {["Henry", "Lora", "John", "Meg", "Lee"].map((name) => (
-                        <View key={name} style={styles.recentContainer}>
+            {/* Action Buttons */}
+            <FlatList
+                data={actionButtonMenu}
+                numColumns={4}
+                columnWrapperStyle={styles.buttonRow}
+                contentContainerStyle={styles.buttonContainer}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        style={styles.buttonItem}
+                        onPress={() => handleAction(item)}
+                        activeOpacity={0.7}
+                    >
+                        <View style={styles.buttonIconContainer}>
                             <Image
-                                source={{ uri: "https://via.placeholder.com/50" }}
-                                style={styles.recentImage}
+                                source={item.icon}
+                                style={styles.buttonIcon}
+                                resizeMode="contain"
                             />
-                            <Text style={styles.recentName}>{name}</Text>
                         </View>
-                    ))}
-                </View>
-            </View>
+                        <Text style={styles.buttonText}>{item.name}</Text>
+                    </TouchableOpacity>
+                )}
+                keyExtractor={item => item.id.toString()}
+            />
 
-            {/* Payment Options */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Payment options</Text>
-                <View style={styles.row}>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="car-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>Transport</Text>
-                    </View>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="tv-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>Internet & TV</Text>
-                    </View>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="call-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>Phone</Text>
-                    </View>
-                    <View style={styles.optionCard}>
-                        <Ionicons name="game-controller-outline" size={24} color="white" />
-                        <Text style={styles.optionText}>Games</Text>
-                    </View>
-                </View>
+            {/* Footer */}
+            <View style={styles.footer}>
+                <Text style={styles.footerText}>© {new Date().getFullYear()} {business.name}</Text>
+                <Text style={styles.footerText}>v1.0.0</Text>
             </View>
-        </ScrollView>
-    );
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#121212",
-        padding: 16,
+        backgroundColor: '#f8f9fa',
+        paddingHorizontal: 16,
     },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 16,
-    },
-    profileImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-    },
-    headerText: {
-        color: "white",
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-    searchContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#1e1e1e",
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 16,
-    },
-    searchInput: {
-        color: "white",
-        marginLeft: 8,
+    loadingContainer: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f8f9fa',
     },
-    section: {
-        marginBottom: 16,
-    },
-    sectionTitle: {
-        color: "white",
+    loadingText: {
+        marginTop: 16,
+        color: '#6c757d',
         fontSize: 16,
-        fontWeight: "bold",
+    },
+    errorText: {
+        color: '#dc3545',
+        fontSize: 16,
+    },
+    companyHeader: {
+        alignItems: 'center',
+        marginVertical: 24,
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e9ecef',
+    },
+    logo: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        marginBottom: 16,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#dee2e6',
+    },
+    logoPlaceholder: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#4A90E2',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    logoText: {
+        fontSize: 48,
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+    companyName: {
+        fontSize: 22,
+        fontWeight: '600',
+        color: '#212529',
+        textAlign: 'center',
+        marginBottom: 4,
+    },
+    companyAddress: {
+        fontSize: 14,
+        color: '#6c757d',
+        textAlign: 'center',
+        maxWidth: '80%',
+    },
+    buttonContainer: {
+        flexGrow: 1,
+        paddingBottom: 16,
+    },
+    buttonRow: {
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    buttonItem: {
+        alignItems: 'center',
+        width: '22%',
+    },
+    buttonIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
         marginBottom: 8,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
-    iconRow: {
-        flexDirection: "row",
-        justifyContent: "space-around",
+    buttonIcon: {
+        width: 30,
+        height: 30,
     },
-    iconContainer: {
-        alignItems: "center",
-    },
-    iconLabel: {
-        color: "white",
+    buttonText: {
+        fontFamily: 'outfit-medium',
         fontSize: 12,
-        marginTop: 4,
+        color: '#495057',
+        textAlign: 'center',
     },
-    row: {
-        flexDirection: "row",
-        justifyContent: "space-around",
+    footer: {
+        paddingVertical: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#e9ecef',
+        alignItems: 'center',
     },
-    optionCard: {
-        backgroundColor: "#1e1e1e",
-        padding: 16,
-        borderRadius: 8,
-        alignItems: "center",
-        flex: 1,
-        marginHorizontal: 4,
-    },
-    optionText: {
-        color: "white",
+    footerText: {
         fontSize: 12,
-        marginTop: 8,
+        color: '#6c757d',
+        marginVertical: 2,
     },
-    recentContainer: {
-        alignItems: "center",
-        marginHorizontal: 8,
-    },
-    recentImage: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-    },
-    recentName: {
-        color: "white",
-        fontSize: 12,
-        marginTop: 4,
-    },
-});
+})
