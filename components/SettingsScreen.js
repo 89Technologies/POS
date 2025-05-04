@@ -17,7 +17,7 @@ export default function ActionButton() {
 
     const fetchCompanyData = async () => {
         try {
-            const response = await axios.get('http://192.168.155.11:8000/Sales/company/')
+            const response = await axios.get('http://192.168.170.172:8000/Sales/company/')
             setBusiness(response.data)
         } catch (error) {
             console.error("Error fetching company data:", error)

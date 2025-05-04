@@ -78,8 +78,8 @@ const SignInScreen = ({ navigation }) => {
             // Make a request to your backend to fetch the user role
 
             // const firebaseId='403qgdQrroZfj1rtekQwATLF09I3';
-            const response = await axios.get(`http://192.168.155.11:8000/Auth/get_user_role/${firebaseId}`);
-            // const response = await axios.get(`http://192.168.155.11:8000/Auth/get_user_role/${firebaseId}`);
+            const response = await axios.get(`http://192.168.170.172:8000/Auth/get_user_role/${firebaseId}`);
+            // const response = await axios.get(`http://192.168.170.172:8000/Auth/get_user_role/${firebaseId}`);
             const role = response.data.role;
             const token = response.data.token;
             console.log("my token")
@@ -98,7 +98,9 @@ const SignInScreen = ({ navigation }) => {
                 Alert.alert('Error', 'Role not found.');
             }
         } catch (error) {
+            navigation.navigate('HomeScreen');
             Alert.alert('Error', 'Failed to fetch user role.');
+            navigation.navigate('HomeScreen');
             //
         }
     };

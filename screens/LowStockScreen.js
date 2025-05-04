@@ -63,7 +63,7 @@ const LowStockScreen = ({ navigation }) => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://192.168.155.11:8000/Sales/low_stock/${user.uid}/`
+                `http://192.168.170.172:8000/Sales/low_stock/${user.uid}/`
             );
 
             if (!response.ok) throw new Error('Failed to fetch low stock products');

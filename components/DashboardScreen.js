@@ -123,12 +123,6 @@ const App = () => {
                     <Text style={styles.menuText}>Sales Order</Text>
                 </TouchableOpacity>
 
-                {/*<TouchableOpacity style={styles.menuItem}>*/}
-                {/*    <View style={styles.menuIconContainer}>*/}
-                {/*        <MaterialIcons name="account-balance" size={30} color="#2196F3" />*/}
-                {/*    </View>*/}
-                {/*    <Text style={styles.menuText}>Cash Ledger</Text>*/}
-                {/*</TouchableOpacity>*/}
 
                 <TouchableOpacity style={styles.menuItem}>
                     <View style={styles.menuIconContainer}>

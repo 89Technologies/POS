@@ -149,7 +149,7 @@ const OrderScreen = () => {
         console.log('my user is----77776557-')
         console.log(user_cashier)
         try {
-            const response = await fetch("http://192.168.155.11:8000/Sales/fetch_customer/");
+            const response = await fetch("http://192.168.170.172:8000/Sales/fetch_customer/");
             const contentType = response.headers.get("content-type");
 
             if (contentType && contentType.includes("application/json")) {
@@ -170,7 +170,7 @@ const OrderScreen = () => {
     // Fetch exchange rate based on selected currency
     const fetchExchangeRate = async (currencyName) => {
         try {
-            const response = await fetch(`http://192.168.155.11:8000/Sales/exchange_rate/${currencyName}`);
+            const response = await fetch(`http://192.168.170.172:8000/Sales/exchange_rate/${currencyName}`);
             const data = await response.json();
             console.log("Parsed Response:", data);
 
@@ -281,7 +281,7 @@ const OrderScreen = () => {
         };
 
         try {
-            const response = await fetch('http://192.168.155.11:8000/Sales/create_transaction/', {
+            const response = await fetch('http://192.168.170.172:8000/Sales/create_transaction/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -339,7 +339,7 @@ const OrderScreen = () => {
     //     };
     //
     //     try {
-    //         const response = await fetch('http://192.168.155.11:8000/Sales/create_transaction/', {
+    //         const response = await fetch('http://192.168.170.172:8000/Sales/create_transaction/', {
     //             method: 'POST',
     //             headers: {
     //                 'Content-Type': 'application/json',

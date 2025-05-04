@@ -62,7 +62,7 @@ const ProfileUpdateScreen = ({ navigation }) => {
             setIsLoading(true);
             const timestamp = new Date().getTime(); // Cache busting
             const response = await fetch(
-                `http://192.168.155.11:8000/Sales/update_profile/${user.uid}/?_=${timestamp}`,
+                `http://192.168.170.172:8000/Sales/update_profile/${user.uid}/?_=${timestamp}`,
                 {
                     headers: {
                         'Cache-Control': 'no-cache',
@@ -137,7 +137,7 @@ const ProfileUpdateScreen = ({ navigation }) => {
             }
 
             const response = await fetch(
-                `http://192.168.155.11:8000/Sales/update_profile/${user.uid}/`,
+                `http://192.168.170.172:8000/Sales/update_profile/${user.uid}/`,
                 {
                     method: 'PATCH',
                     body: formData,

@@ -92,7 +92,7 @@ const ProductsScreen = () => {
 
     const fetchProducts = async (firebaseUserId) => {
         try {
-            const response = await fetch(`http://192.168.155.11:8000/Sales/products/${firebaseUserId}/`);
+            const response = await fetch(`http://192.168.170.172:8000/Sales/products/${firebaseUserId}/`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -108,7 +108,7 @@ const ProductsScreen = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://192.168.155.11:8000/Sales/categories/');
+            const response = await fetch('http://192.168.170.172:8000/Sales/categories/');
             const data = await response.json();
             setCategories(data);
         } catch (error) {
@@ -119,7 +119,7 @@ const ProductsScreen = () => {
 
     const fetchBranches = async (firebaseUserId) => {
         try {
-            const response = await fetch(`http://192.168.155.11:8000/Sales/branches/${firebaseUserId}/`);
+            const response = await fetch(`http://192.168.170.172:8000/Sales/branches/${firebaseUserId}/`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -149,8 +149,8 @@ const ProductsScreen = () => {
             setLoading(true);
 
             const url = product.id
-                ? `http://192.168.155.11:8000/Sales/update_products/${product.id}/`
-                : `http://192.168.155.11:8000/Sales/Add_products/${firebaseId}/`;
+                ? `http://192.168.170.172:8000/Sales/update_products/${product.id}/`
+                : `http://192.168.170.172:8000/Sales/Add_products/${firebaseId}/`;
 
             const method = product.id ? 'PUT' : 'POST';
 
@@ -240,7 +240,7 @@ const ProductsScreen = () => {
                         style: 'destructive',
                         onPress: async () => {
                             const response = await fetch(
-                                `http://192.168.155.11:8000/Sales/products/${productId}/delete/`,
+                                `http://192.168.170.172:8000/Sales/products/${productId}/delete/`,
                                 { method: 'DELETE' }
                             );
 
@@ -285,7 +285,7 @@ const ProductsScreen = () => {
             setTransferLoading(true);
 
             const response = await fetch(
-                `http://192.168.155.11:8000/Sales/transfer_stock/${transferProduct.id}/`,
+                `http://192.168.170.172:8000/Sales/transfer_stock/${transferProduct.id}/`,
                 {
                     method: 'POST',
                     headers: {

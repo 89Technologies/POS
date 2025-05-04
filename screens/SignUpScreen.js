@@ -71,7 +71,7 @@ const SignUpScreen = ({ navigation }) => {
                 password,
             };
 
-            const response = await fetch('http://192.168.155.11:8000/Auth/register/', {
+            const response = await fetch('http://192.168.170.172:8000/Auth/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

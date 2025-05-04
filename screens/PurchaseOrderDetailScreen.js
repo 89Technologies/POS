@@ -6,7 +6,7 @@ import axios from 'axios';
 import * as Print from 'expo-print';
 import { getAuth } from 'firebase/auth';
 
-const API_BASE_URL = 'http://192.168.155.11:8000/Sales';
+const API_BASE_URL = 'http://192.168.170.172:8000/Sales';
 
 const PurchaseOrderScreen = ({ navigation }) => {
     const [orders, setOrders] = useState([]);

@@ -88,7 +88,7 @@ const SuppliersScreen = () => {
 
     const fetchSuppliers = async (firebaseUserId) => {
         try {
-            const response = await fetch(`http://192.168.155.11:8000/Sales/suppliers/${firebaseUserId}/`);
+            const response = await fetch(`http://192.168.170.172:8000/Sales/suppliers/${firebaseUserId}/`);
             const data = await response.json();
 
             console.log('suppliers', data)
@@ -105,7 +105,7 @@ const SuppliersScreen = () => {
 
     const fetchBranches = async (firebaseUserId) => {
         try {
-            const response = await fetch(`http://192.168.155.11:8000/Sales/getbranches/${firebaseUserId}/`);
+            const response = await fetch(`http://192.168.170.172:8000/Sales/getbranches/${firebaseUserId}/`);
             const data = await response.json();
 
             if (!response.ok) {
@@ -135,8 +135,8 @@ const SuppliersScreen = () => {
             setLoading(true);
 
             const url = supplier.id
-                ? `http://192.168.155.11:8000/Sales/suppliers/${firebaseId}/${supplier.id}/update/`
-                : `http://192.168.155.11:8000/Sales/suppliers/${firebaseId}/create/`;
+                ? `http://192.168.170.172:8000/Sales/suppliers/${firebaseId}/${supplier.id}/update/`
+                : `http://192.168.170.172:8000/Sales/suppliers/${firebaseId}/create/`;
 
             const method = supplier.id ? 'PUT' : 'POST';
 
@@ -210,7 +210,7 @@ const SuppliersScreen = () => {
                         style: 'destructive',
                         onPress: async () => {
                             const response = await fetch(
-                                `http://192.168.155.11:8000/Sales/suppliers/${firebaseId}/${supplierId}/delete/`,
+                                `http://192.168.170.172:8000/Sales/suppliers/${firebaseId}/${supplierId}/delete/`,
                                 { method: 'DELETE' }
                             );
 

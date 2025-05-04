@@ -4,7 +4,7 @@ import { getAuth } from 'firebase/auth';
 const auth=getAuth();
 
 // Configure your base API URL
-const BASE_API_URL = 'http://192.168.155.11:8000/Sales'; // Replace with your actual backend URL
+const BASE_API_URL = 'http://192.168.170.172:8000/Sales'; // Replace with your actual backend URL
 
 // Helper function to get Firebase user ID
 const getFirebaseUserId = async () => {
